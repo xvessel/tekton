@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: build-app
+spec:
+  inputs:
+    resources:
+      - name: tekton-demo
+        type: git
+    params:
+      - name: pathToDockerFile
+        description: the path to the dockerfile to build
+        default: /workspace/tekton-demo/stable/alpine/Dockerfile
+      - name: pathToContext
+        description: the build context used by Kaniko
+        default: /workspace/tekton-demo/stable/alpine/
+  outputs:
+    resources:
+      - name: builtImage
+        type: image
+  steps:
+    - name: build-tekton-demo
+      image: registry.cn-shanghai.aliyuncs.com/kangzhiqiang/tekton-test:0.1
+      workingDir: /
+      command:
+        - ls
+      args:
+        - -l
+    - name: build-docker-image
+      image: twistedvines/kaniko-executor
+      env:
+      - name: "DOCKER_CONFIG"
+        value: "/builder/home/.docker/"
+      command: 
+#        - ping 
+        - /kaniko/executor
+      args: 
+#        - www.baidu.com  
+        - --dockerfile=${inputs.params.pathToDockerFile}
+        - --destination=${outputs.resources.builtImage.url}
+        - --context=${inputs.params.pathToContext}

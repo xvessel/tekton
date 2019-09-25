@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: registry-pipelines-resource
+spec:
+  type: image
+  params:
+    - name: url
+      value: jyskzq/tekton-test # replace this value to your registry
